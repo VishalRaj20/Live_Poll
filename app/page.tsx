@@ -123,7 +123,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8 md:py-24 flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-24 min-h-[calc(100vh-80px)]">
+      <div className="container mx-auto px-4 pt-32 pb-20 md:py-24 flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-24 min-h-[calc(100vh-80px)]">
 
         {/* Left Column: Hero Content */}
         <motion.div

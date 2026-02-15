@@ -66,6 +66,7 @@ export default function PollView({ id, question, options, require_login = false 
                 { event: 'INSERT', schema: 'public', table: 'votes', filter: `poll_id=eq.${id}` },
                 (payload) => {
                     const newVote = payload.new as any;
+                    console.log("Realtime INSERT received:", newVote);
 
                     // Ignore our own vote to prevent double counting (since we update optimistically)
                     if (newVote.device_id === deviceId || (user && newVote.user_id === user.id)) {
@@ -85,11 +86,17 @@ export default function PollView({ id, question, options, require_login = false 
             .on(
                 'postgres_changes',
                 { event: 'UPDATE', schema: 'public', table: 'votes', filter: `poll_id=eq.${id}` },
-                () => {
+                (payload) => {
+                    console.log("Realtime UPDATE received:", payload);
                     fetchVotes();
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                console.log("Realtime connection status:", status);
+                if (status === 'SUBSCRIBED') {
+                    // toast.success("Connected to live updates");
+                }
+            });
 
         return () => {
             supabase.removeChannel(channel);
