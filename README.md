@@ -4,6 +4,7 @@ LivePoll is a simple real-time polling web application built using **Next.js**, 
 It allows users to create polls, share them via a link, and see results update live as people vote.
 
 ![LivePoll Demo](https://github.com/VishalRaj20/Live_Poll/blob/3771bd1a7904905613d440b376c98995f7dcd9de/public/Screenshot%202026-02-17%20013523.png)
+![LivePoll Demo](https://github.com/VishalRaj20/Live_Poll/blob/0b8a41e2be0821f17045a5ff1ccde21aea2f3cfc/public/Screenshot%202026-02-17%20014840.png)
 
 ## Features
 
