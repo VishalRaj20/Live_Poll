@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +33,11 @@ export default function PollView({ id, question, options, require_login = false 
     const [deviceId, setDeviceId] = useState("");
     const [viewMode, setViewMode] = useState<'list' | 'bar' | 'pie'>('list');
     const [user, setUser] = useState<any>(null); // Auth user state
+    const userRef = useRef(user);
+
+    useEffect(() => {
+        userRef.current = user;
+    }, [user]);
 
     useEffect(() => {
         let storedDeviceId = localStorage.getItem("livepoll_device_id");
@@ -69,7 +74,9 @@ export default function PollView({ id, question, options, require_login = false 
                     console.log("Realtime INSERT received:", newVote);
 
                     // Ignore our own vote to prevent double counting (since we update optimistically)
-                    if (newVote.device_id === deviceId || (user && newVote.user_id === user.id)) {
+                    // Use storedDeviceId (local var) and userRef.current (mutable ref) to avoid stale closures
+                    if (newVote.device_id === storedDeviceId || (userRef.current && newVote.user_id === userRef.current.id)) {
+                        console.log("Ignoring own vote via Realtime");
                         return;
                     }
 

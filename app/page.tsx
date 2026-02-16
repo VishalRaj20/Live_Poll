@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
-import { ArrowRight, BarChart2, CheckCircle2, Share2, Zap } from "lucide-react";
+import { ArrowRight, BarChart2, Share2, Zap } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { supabase } from "@/lib/supabase";
