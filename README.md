@@ -2,7 +2,7 @@
 
 LivePoll is a modern, real-time polling application built with **Next.js 15**, **Supabase**, and **Tailwind CSS**. It allows users to create polls instantly, share them via a link, and watch results update live as votes come in.
 
-![LivePoll Demo](/opengraph-image.png)
+![LivePoll Demo](https://github.com/VishalRaj20/Live_Poll/blob/3771bd1a7904905613d440b376c98995f7dcd9de/public/Screenshot%202026-02-17%20013523.png)
 
 ## 🛡️ Fairness / Anti-Abuse Mechanisms
 
@@ -71,7 +71,7 @@ For polls requiring higher security and integrity, creators can enable **"Strict
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/live-poll.git
+    https://github.com/VishalRaj20/Live_Poll.git
     cd live-poll
     ```
 
@@ -81,20 +81,13 @@ For polls requiring higher security and integrity, creators can enable **"Strict
     ```
 
 3.  **Environment Setup**:
-    Create a `.env.local` file in the root directory:
+    Create a `.env` file in the root directory:
     ```bash
     NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
     ```
 
-4.  **Database Setup**:
-    Run the SQL scripts located in `supabase/schema.sql` in your Supabase SQL Editor to set up the tables and policies.
-
-5.  **Run the application**:
+4.  **Run the application**:
     ```bash
     npm run dev
     ```
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
