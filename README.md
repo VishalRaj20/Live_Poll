@@ -1,80 +1,96 @@
-# LivePoll - Real-time Instant Polling Application
+# LivePoll – Real-Time Polling App
 
-LivePoll is a modern, real-time polling application built with **Next.js 15**, **Supabase**, and **Tailwind CSS**. It allows users to create polls instantly, share them via a link, and watch results update live as votes come in.
+LivePoll is a simple real-time polling web application built using **Next.js**, **Supabase**, and **Tailwind CSS**.  
+It allows users to create polls, share them via a link, and see results update live as people vote.
 
 ![LivePoll Demo](https://github.com/VishalRaj20/Live_Poll/blob/3771bd1a7904905613d440b376c98995f7dcd9de/public/Screenshot%202026-02-17%20013523.png)
 
-## 🛡️ Fairness / Anti-Abuse Mechanisms
+## Features
 
-To ensure the integrity of poll results, LivePoll implements two distinct mechanisms to prevent repeat or abusive voting.
-
-### Mechanism 1: Device ID Fingerprinting (Anonymous Polling)
-For public polls where ease of access is prioritized, we use a browser-based fingerprinting method.
-
-*   **How it works**: When a user visits a poll, a unique `UUID` is generated and stored in their browser's `localStorage`. When a vote is submitted, this `device_id` is sent to the API.
-*   **Enforcement**: The database (`votes` table) has a unique constraint on `(poll_id, device_id)`. The API checks if a vote with this `device_id` already exists for the given poll.
-*   **Threats Prevented**:
-    *   Prevents users from spamming the "Vote" button.
-    *   Prevents casual re-voting by refreshing the page or navigating away and back.
-*   **Known Limitations**: This is a "soft" security measure. Sophisticated users can bypass this by clearing their browser cache, using Incognito mode, or using a different browser.
-
-### Mechanism 2: Strict Mode (Authenticated Voting)
-For polls requiring higher security and integrity, creators can enable **"Strict Mode"**.
-
-*   **How it works**: When creating a poll, the "Require Login" option can be toggled. This restricts voting to authenticated users only.
-*   **Enforcement**:
-    *   **Frontend**: The UI blocks the vote action and prompts the user to log in.
-    *   **Backend**: The API validates the user's Supabase Auth session token. The database records the encrypted `user_id` alongside the vote. A unique constraint on `(poll_id, user_id)` ensures one person cannot vote multiple times, even if they switch devices.
-*   **Threats Prevented**:
-    *   Prevents "Device Hopping" (voting from phone, then laptop, then tablet).
-    *   Prevents Incognito/Private window abuse.
-    *   Ensures 1 Person = 1 Vote (assuming 1 account per person).
-*   **Edge Cases Handled**:
-    *   **Concurrent Voting**: Logic handles race conditions where a user might try to vote from two devices simultaneously.
-    *   **Session Expiry**: Gracefully handles expired tokens by redirecting to login.
-
-### Edge Cases & General Handling
-*   **Vote Changing**: Instead of blocking a user who tries to vote again, we implemented an **UPSERT** (Update or Insert) strategy. If a user changes their mind, they can switch their vote. The system decrements their old option and increments the new one, maintaining the "1 Vote per User" rule while improving UX.
-*   **Database Constraints**: We rely on PostgreSQL level `UNIQUE` constraints as the final source of truth, ensuring that even if the API logic fails, the database remains consistent.
-
-### Future Improvements
-*   **IP Rate Limiting**: Implementing IP-based limiting (via Redis or Middleware) would add another layer of protection against bot nets.
-*   **CAPTCHA**: Adding a CAPTCHA (e.g., Turnstile) for anonymous polls would significantly reduce automated bot spam.
+- Create a poll with a question and multiple options
+- Share a link so others can join and vote
+- Real-time result updates using Supabase Realtime
+- Results displayed using progress bars and charts
+- Data is persisted in PostgreSQL (Supabase)
+- Responsive UI built with shadcn/ui and Tailwind CSS
 
 ---
 
-## 🚀 Key Features
+## Fairness / Anti-Abuse
 
-*   **Real-time Updates**: Powered by **Supabase Realtime**, results update instantly across all connected clients without refreshing.
-*   **Beautiful Visualizations**:
-    *   Dynamic Progress Bars (Framer Motion)
-    *   Interactive Bar & Pie Charts (Recharts)
-*   **Premium UI/UX**:
-    *   Glassmorphism design system
-    *   Mesh gradient backgrounds
-    *   Smooth layout animations
-    *   Responsive Grid Layouts
-*   **Dashboard**: Users can track polls they've created and voted on.
-*   **Smart Sharing**: One-click link copying and easy sharing.
+The app includes two mechanisms to reduce repeat or abusive voting.
 
-## 🛠️ Tech Stack
+### 1. Device-based voting (Anonymous polls)
 
-*   **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
-*   **Language**: TypeScript
-*   **Styling**: Tailwind CSS, Shadcn/UI
-*   **Backend**: Supabase (PostgreSQL, Auth, Realtime)
-*   **Animations**: Framer Motion
-*   **Charts**: Recharts
-*   **Icons**: Lucide React
+- When a user opens the app, a unique `device_id` is generated and stored in `localStorage`.
+- This `device_id` is sent with every vote request.
+- In the database, there is a unique constraint on `(poll_id, device_id)` in the `votes` table.
+- This means the same browser/device cannot vote more than once on the same poll.
 
-## 📦 Installation & Setup
+**Prevents:**
+- Repeated voting from the same browser
+- Spamming the vote button or refreshing the page to vote again
 
-1.  **Clone the repository**:
-    ```bash
-    https://github.com/VishalRaj20/Live_Poll.git
-    cd live-poll
-    ```
+**Limitations:**
+- A user can bypass this by clearing browser data, using incognito mode, or switching devices/browsers.
 
+---
+
+### 2. Strict Mode (Authenticated voting)
+
+- When creating a poll, the creator can enable **Require Login (Strict Mode)**.
+- In this mode, only logged-in users can vote.
+- The backend verifies the Supabase Auth session before accepting a vote.
+- The `votes` table stores the `user_id` and has a unique constraint on `(poll_id, user_id)`.
+
+**Prevents:**
+- Voting multiple times from different devices
+- Incognito/private window abuse
+- Enforces one vote per account per poll
+
+**Limitations:**
+- A user could still create multiple accounts.
+
+---
+
+## Edge Cases Handled
+
+- Poll not found (shows a proper error state)
+- Validation: at least 2 non-empty options required to create a poll
+- Duplicate voting is blocked by database constraints
+- Concurrent voting is handled safely using database constraints and server-side checks
+- Page refresh does not lose data (all data is persisted in Supabase)
+- Vote changing is handled using an UPSERT strategy (user can change their vote while still keeping 1 vote per user/device)
+
+---
+
+## Known Limitations / Future Improvements
+
+- Anonymous polls rely on `device_id`, which can be bypassed by clearing browser storage
+- No IP-based rate limiting yet (could be added later with middleware or Redis)
+- No CAPTCHA for anonymous polls
+- No poll expiration or closing feature yet
+
+---
+
+## Tech Stack
+
+- **Framework:** Next.js (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS, shadcn/ui
+- **Backend & DB:** Supabase (PostgreSQL, Realtime, Auth)
+- **Charts & Animations:** Recharts, Framer Motion
+
+---
+
+## Setup & Run Locally
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/VishalRaj20/Live_Poll.git
+   cd Live_Poll
+   ```
+   
 2.  **Install dependencies**:
     ```bash
     npm install
